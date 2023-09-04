@@ -130,6 +130,10 @@ This command will only show the number of boys baptized each year. `R` interpret
 
 1.  What command would you use to extract just the counts of girls baptized? Try it out in the console!
 
+```{r view-girls}
+arbuthnot$girls
+```
+
 Notice that the way `R` has printed these data is different. When we looked at the complete data frame, we saw 82 rows, one on each line of the display. These data have been extracted from the data frame, so they are no longer structured in a table with other variables. Instead, these data are displayed one right after another. Objects that print out in this way are called *vectors*; similar to the vectors you have seen in mathematics courses, vectors represent a list of numbers. `R` has added numbers displayed in [brackets] along the left side of the printout to indicate each entry's location within the vector. For example, 5218 follows `[1]`, indicating that `5218` is the first entry in the vector. If `[43]` was displayed at the beginning of a line, that indicate that the first number displayed on that line would correspond to the 43<sup>rd</sup> entry in that vector.
 
 ### Data visualization
@@ -256,6 +260,10 @@ Notice that rather than dividing by `boys + girls` we are using the `total` vari
 
 3.  Now, generate a plot of the proportion of boys born over time. What do you see?
 
+```{r plot-boy_ratio-vs-year}
+ggplot(data = arbuthnot, aes(x = year, y = boy_ratio)) + 
+  geom_line()
+```
 <div>
 
 **Tip:** If you use the up and down arrow keys in the console, you can scroll through your previous commands, your so-called command history. You can also access your command history by clicking on the history tab in the upper right panel. This can save you a lot of typing in the future.
@@ -290,16 +298,67 @@ Answer the following questions with the `present` data frame:
 
 1.  What years are included in this data set? What are the dimensions of the data frame? What are the variable (column) names?
 
+This text is added by **Karthik.**
+
+First, let's load the `present` data frame:
+
+```{r load-present-data-frame}
+present
+```
+
+Having loaded the `present` data frame, let us now use the `glimpse()` function to examine its dimensions, variables, and ranges for the `year` column.
+
+```{r glimpse-present}
+glimpse(present)
+present %>%
+  summarize(min = min(year),
+            max = max(year)
+  )
+```
+
+The dimensions of the `present` data frame are as follows:
+```{r glimpse-present-view, echo=FALSE,results=TRUE}
+glimpse(present)
+```
+
+The years included in the data frame range from:
+```{r view-year-range,echo=FALSE,results=TRUE}
+present %>%
+  summarize(min = min(year),
+            max = max(year)
+  )
+```
+
 2.  How do these counts compare to Arbuthnot's? Are they of a similar magnitude?
+
+This text is added by **Karthik.**
+
+Compared to Arbuthnot's data set the number of babies baptized in the US in the present time period has gone up by a factor of 200, approximately.
 
 3.  Make a plot that displays the proportion of boys born over time. What do you see? Does Arbuthnot's observation about boys being born in greater proportion than girls hold up in the U.S.? Include the plot in your response. *Hint:* You should be able to reuse your code from Exercise 3 above, just replace the name of the data frame.
 
+This text is added by **Karthik.**
+
+```{r present-boys-ratio}
+present <- present %>%
+  mutate(
+    total = boys + girls
+  )
+present <- present %>%
+  mutate(boys_ratio = boys / total)
+ggplot(data=present,aes(x = year, y = boys_ratio, ymin=0.5)) + geom_line()
+```
+
+As evident from the graph, the proportion of boys remains over 51% throughout the observation period.
+
 4.  In what year did we see the most total number of births in the U.S.? *Hint:* First calculate the totals and save it as a new variable. Then, sort your dataset in descending order based on the `total` column. You can do this interactively in the data viewer by clicking on the arrows next to the variable names. To include the sorted result in your report you will need to use two new functions. First we use `arrange()` to sorting the variable. Then we can arrange the data in a descending order with another function, `desc()`, for descending order. The sample code is provided below.
 
-```{r sample-arrange, eval=FALSE}
+```{r sample-arrange, results=TRUE}
 present %>%
   arrange(desc(total))
 ```
+
+From this arrangement, we can see that the total number of births was highest in `1961`.
 
 These data come from reports by the Centers for Disease Control. You can learn more about them by bringing up the help file using the command `?present`.
 

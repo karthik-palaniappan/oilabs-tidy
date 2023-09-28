@@ -208,6 +208,12 @@ If you are interested in either flights headed to SFO **or** in February, you ca
 
 1.  Create a new data frame that includes flights headed to SFO in February, and save this data frame as `sfo_feb_flights`.
     How many flights meet these criteria?
+    
+```{r sfo-feb-flights-examine}
+glimpse(sfo_feb_flights)
+```
+
+So 68 flight meet this criteria.
 
 2.  Describe the distribution of the **arrival** delays of these flights using a histogram and appropriate summary statistics.
     **Hint:** The summary statistics you use should depend on the shape of the distribution.

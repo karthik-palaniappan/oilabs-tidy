@@ -210,13 +210,28 @@ If you are interested in either flights headed to SFO **or** in February, you ca
     How many flights meet these criteria?
     
 ```{r sfo-feb-flights-examine}
-glimpse(sfo_feb_flights)
+sfo_feb_flights %>%
+  summarise(mean_dd   = mean(dep_delay), 
+            median_dd = median(dep_delay), 
+            n         = n())
 ```
 
 So 68 flight meet this criteria.
 
 2.  Describe the distribution of the **arrival** delays of these flights using a histogram and appropriate summary statistics.
     **Hint:** The summary statistics you use should depend on the shape of the distribution.
+
+```{r hist-sfo-feb-flights}
+ggplot(data = sfo_feb_flights, aes(x = arr_delay)) +
+  geom_histogram()
+```
+```{r sfo-feb-flights-examine-2}
+sfo_feb_flights %>%
+  summarise(mean_ad   = mean(arr_delay), 
+            median_ad = median(arr_delay),
+            sd_ad = sd(arr_delay),
+            n         = n())
+```
 
 Another useful technique is quickly calculating summary statistics for various groups in your data frame.
 For example, we can modify the above command using the `group_by` function to get the same summary stats for each origin airport:
@@ -230,6 +245,13 @@ sfo_feb_flights %>%
 Here, we first grouped the data by `origin` and then calculated the summary statistics.
 
 1.  Calculate the median and interquartile range for `arr_delay`s of flights in in the `sfo_feb_flights` data frame, grouped by carrier. Which carrier has the most variable arrival delays?
+
+```{r summary-custom-list-carrier}
+sfo_feb_flights %>%
+  group_by(carrier) %>%
+  summarise(median_ad = median(arr_delay), iqr_ad = IQR(arr_delay), n_flights = n())
+```
+Delta and United (DL and UA) have the most variable arrival delays - reason.  highest IQR.
 
 ### Departure delays by month
 
@@ -247,11 +269,22 @@ Let's think about how you could answer this question:
 ```{r mean-dep-delay-months}
 nycflights %>%
   group_by(month) %>%
-  summarise(mean_dd = mean(dep_delay)) %>%
-  arrange(desc(mean_dd))
+  summarise(mean_dd = mean(dep_delay), median_dd = median(dep_delay)) %>%
+  arrange(mean_dd)
 ```
 
+Surprisingly, July has the largest departure delays.
+
 1.  Suppose you really dislike departure delays and you want to schedule your travel in a month that minimizes your potential departure delay leaving NYC. One option is to choose the month with the lowest mean departure delay. Another option is to choose the month with the lowest median departure delay. What are the pros and cons of these two choices?
+
+```{r mean-dep-delay-months}
+nycflights %>%
+  group_by(month) %>%
+  summarise(mean_dd = mean(dep_delay), median_dd = median(dep_delay)) %>%
+  arrange(desc(median_dd))
+```
+
+I'll probably pick the lowest median delay month - this guarantees that in 50% of the cases, my delay will be smaller than the median.  The average could be influenced heavily by outliers.
 
 ```{=html}
 <!--
@@ -290,11 +323,13 @@ We can handle all of the remaining steps in one code chunk:
 ```{r ot-dep-rate}
 nycflights %>%
   group_by(origin) %>%
-  summarise(ot_dep_rate = sum(dep_type == "on time") / n()) %>%
+  summarise(ot_dep_rate = sum(dep_type == "on time") / n(), n()) %>%
   arrange(desc(ot_dep_rate))
 ```
 
 1.  If you were selecting an airport simply based on on time departure percentage, which NYC airport would you choose to fly out of?
+
+LGA
 
 You can also visualize the distribution of on on time departure rate across the three airports using a segmented bar plot.
 
@@ -310,9 +345,19 @@ ggplot(data = nycflights, aes(x = origin, fill = dep_type)) +
 1.  Mutate the data frame so that it includes a new variable that contains the average speed, `avg_speed` traveled by the plane for each flight (in mph).
     **Hint:** Average speed can be calculated as distance divided by number of hours of travel, and note that `air_time` is given in minutes.
 
+```{r avg_speed}
+nycflights <- nycflights %>%
+  mutate(avg_speed = distance*60/air_time)
+```
+
 2.  Make a scatterplot of `avg_speed` vs. `distance`.
     Describe the relationship between average speed and distance.
     **Hint:** Use `geom_point()`.
+
+```{r viz-avg_speed}
+ggplot(data = nycflights, aes(x = distance, y = avg_speed)) +
+  geom_point()
+```
 
 3.  Replicate the following plot.
     **Hint:** The data frame plotted only contains flights from American Airlines, Delta Airlines, and United Airlines, and the points are `color`ed by `carrier`.

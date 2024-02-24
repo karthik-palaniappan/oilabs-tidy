@@ -277,7 +277,7 @@ Surprisingly, July has the largest departure delays.
 
 1.  Suppose you really dislike departure delays and you want to schedule your travel in a month that minimizes your potential departure delay leaving NYC. One option is to choose the month with the lowest mean departure delay. Another option is to choose the month with the lowest median departure delay. What are the pros and cons of these two choices?
 
-```{r mean-dep-delay-months}
+```{r mean-dep-delay-months-2}
 nycflights %>%
   group_by(month) %>%
   summarise(mean_dd = mean(dep_delay), median_dd = median(dep_delay)) %>%
